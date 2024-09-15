@@ -10,11 +10,13 @@ const getAddProduct = (req, res, next) => {
   });
 };
 
-const postAddProduct = (req, res, next) => {
-  const product = new Product(req.body);
+const AddProduct = (req, res, next) => {
+  const { title, imgUrl, price, description } = req.body;
+  const product = new Product(title, imgUrl, price, description);
   product.save();
   res.redirect("/");
 };
+
 const getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render("admin/products", {
@@ -25,4 +27,4 @@ const getProducts = (req, res, next) => {
   });
 };
 
-export default { getAddProduct, postAddProduct, getProducts };
+export default { getAddProduct, AddProduct, getProducts };
