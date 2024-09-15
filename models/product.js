@@ -27,6 +27,7 @@ export default class Product {
   }
 
   save() {
+    this.id = Math.random().toString();
     getProductsFromFile((products) => {
       products.push(this);
       fs.writeFile(p, JSON.stringify(products), (err) => {
@@ -39,5 +40,10 @@ export default class Product {
 
   static fetchAll(cb) {
     getProductsFromFile(cb);
+  }
+  static findById(id, cb) {
+    getProductsFromFile((products) => {
+      cb(products.find((product) => product.id == id));
+    });
   }
 }
