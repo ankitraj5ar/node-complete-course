@@ -44,6 +44,14 @@ const addCart = (req, res, next) => {
   res.redirect("/cart");
 };
 
+const postCartDeleteProduct = (req, res, next) => {
+  const prodId = req.body.productId;
+  Product.findById(prodId, (product) => {
+    Cart.deleteProduct(prodId, product.price);
+    res.redirect("/cart");
+  });
+};
+
 const getOrders = (req, res, next) => {
   res.render("shop/orders", {
     path: "/orders",
@@ -65,4 +73,5 @@ export default {
   addCart,
   getOrders,
   getCheckout,
+  postCartDeleteProduct,
 };

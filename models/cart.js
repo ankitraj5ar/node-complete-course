@@ -14,7 +14,10 @@ export default class Cart {
     fs.readFile(p, (err, fileContent) => {
       let cart = { products: [], totalPrice: 0 };
       if (!err) {
-        cart = JSON.parse(fileContent);
+        let oldCart = JSON.parse(fileContent);
+        if (oldCart.hasOwnProperty("products")) {
+          cart = oldCart;
+        }
       }
       // Analyze the cart => Find existing product
       const existingProductIndex = cart.products.findIndex(
@@ -33,6 +36,20 @@ export default class Cart {
         cart.products = [...cart.products, updatedProduct];
       }
       cart.totalPrice = cart.totalPrice + +productPrice;
+      fs.writeFile(p, JSON.stringify(cart), (err) => {
+        if (err) console.log(err);
+      });
+    });
+  }
+
+  static deleteProduct(id, productPrice) {
+    fs.readFile(p, (err, fileContent) => {
+      if (err) return;
+      const cart = JSON.parse(fileContent);
+      const totalPrice = cart.totalPrice;
+      const product = cart.products.find((prod) => prod.id == id);
+      cart.totalPrice = totalPrice - productPrice * product.qty;
+      cart.products = cart.products.filter((prod) => prod.id != id);
       fs.writeFile(p, JSON.stringify(cart), (err) => {
         if (err) console.log(err);
       });

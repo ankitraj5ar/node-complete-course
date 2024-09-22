@@ -22,7 +22,13 @@ const editProduct = (req, res, next) => {
   const { productId, title, imgUrl, price, description } = req.body;
   const product = new Product(productId, title, imgUrl, price, description);
   product.save();
-  res.redirect("/");
+  res.redirect("/admin/products");
+};
+
+const deleteProduct = (req, res, next) => {
+  const { productId } = req.body;
+  Product.deleteById(productId);
+  res.redirect("/admin/products");
 };
 
 const getEditProduct = (req, res, next) => {
@@ -60,4 +66,5 @@ export default {
   getEditProduct,
   editProduct,
   getProducts,
+  deleteProduct,
 };

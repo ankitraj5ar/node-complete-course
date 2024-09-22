@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import Cart from "./cart.js";
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -49,6 +50,17 @@ export default class Product {
           }
         });
       }
+    });
+  }
+  static deleteById(id) {
+    getProductsFromFile((products) => {
+      const product = products.find((prod) => prod.id == id);
+      const updateProducts = products.filter((prod) => prod.id != id);
+      fs.writeFile(p, JSON.stringify(updateProducts), (err) => {
+        if (!err) {
+          Cart.deleteProduct(id, product.price);
+        }
+      });
     });
   }
 
