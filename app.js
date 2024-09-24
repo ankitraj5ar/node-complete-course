@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import sequelize from "./util/database.js";
 
 import errorController from "./controllers/error.js";
 import adminRoutes from "./routes/admin.js"; // Add .js extension for ES module imports
@@ -22,5 +23,12 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
-
-app.listen(3000);
+sequelize
+  .sync()
+  .then((result) => {
+    console.log(result);
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

@@ -9,7 +9,7 @@ router.get("/products", adminController.getProducts);
 
 // /admin/add-product => POST
 router.post("/add-product", adminController.AddProduct);
-router.get("/edit-product/:productId", adminController.getEditProduct);
+router.get("/edit-product/:int_product_id", adminController.getEditProduct);
 router.post("/edit-product", adminController.editProduct);
 router.post("/delete-product", adminController.deleteProduct);
 export default router;
