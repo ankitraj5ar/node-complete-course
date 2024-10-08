@@ -10,6 +10,10 @@ const CartDetail = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
+    int_quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   { tableName: "tbl_cart_detail" }
 );

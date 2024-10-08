@@ -27,7 +27,6 @@ const getIndex = async (req, res, next) => {
 };
 const getCart = async (req, res, next) => {
   const cart = await req.user.getCart();
-  console.log(cart);
   const products = await cart.getProducts();
   res.render("shop/cart", {
     path: "/cart",
@@ -38,21 +37,42 @@ const getCart = async (req, res, next) => {
 const addCart = async (req, res, next) => {
   const prodId = req.body.int_product_id;
   const cart = await req.user.getCart();
-  const product = await cart.getProducts({
-    where: { int_cart_detail_id: prodId },
+  const products = await cart.getProducts({
+    where: { int_product_id: prodId },
   });
-  if (product && product.length > 0) {
-    product = product[0];
+  let product;
+  if (products && products.length > 0) {
+    product = products[0];
   }
+  let newQuantity = 1;
+  if (product) {
+    const oldQuantity = product.CartDetail.int_quantity;
+    newQuantity = oldQuantity + 1;
+    await cart.addProduct(product, { through: { int_quantity: newQuantity } });
+  } else {
+    const newProduct = await Product.findByPk(prodId);
+    await cart.addProduct(newProduct, {
+      through: { int_quantity: newQuantity },
+    });
+  }
+
   res.redirect("/cart");
 };
 
-const postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect("/cart");
+const postCartDeleteProduct = async (req, res, next) => {
+  const prodId = req.body.int_product_id;
+  const cart = await req.user.getCart();
+  const products = await cart.getProducts({
+    where: { int_product_id: prodId },
   });
+
+  let product;
+  if (products && products.length > 0) {
+    product = products[0];
+    await product.CartDetail.destroy();
+  }
+
+  res.redirect("/cart");
 };
 
 const getOrders = (req, res, next) => {
