@@ -1,17 +1,17 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../util/database.js";
 
-const Cart = sequelize.define(
-  "Cart",
+const CartDetail = sequelize.define(
+  "CartDetail",
   {
-    int_cart_id: {
+    int_cart_detail_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
     },
   },
-  { tableName: "tbl_cart" }
+  { tableName: "tbl_cart_detail" }
 );
 
-export default Cart;
+export default CartDetail;

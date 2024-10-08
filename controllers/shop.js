@@ -25,17 +25,25 @@ const getIndex = async (req, res, next) => {
     path: "/",
   });
 };
-const getCart = (req, res, next) => {
+const getCart = async (req, res, next) => {
+  const cart = await req.user.getCart();
+  console.log(cart);
+  const products = await cart.getProducts();
   res.render("shop/cart", {
     path: "/cart",
     pageTitle: "Your Cart",
+    products: products,
   });
 };
-const addCart = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(prodId, product.price);
+const addCart = async (req, res, next) => {
+  const prodId = req.body.int_product_id;
+  const cart = await req.user.getCart();
+  const product = await cart.getProducts({
+    where: { int_cart_detail_id: prodId },
   });
+  if (product && product.length > 0) {
+    product = product[0];
+  }
   res.redirect("/cart");
 };
 

@@ -12,7 +12,8 @@ const getAddProduct = (req, res, next) => {
 };
 
 const AddProduct = async (req, res, next) => {
-  await Product.create(req.body);
+  await req.user.createProduct(req.body);
+  // await Product.create({ ...req.body, UserIntUserId: req.user.int_user_id });
   res.redirect("/admin/products");
 };
 
@@ -48,7 +49,7 @@ const getEditProduct = async (req, res, next) => {
 };
 
 const getProducts = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await req.user.getProducts();
   res.render("admin/products", {
     prods: products,
     pageTitle: "Admin Products",
