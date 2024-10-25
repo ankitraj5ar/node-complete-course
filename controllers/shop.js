@@ -75,10 +75,13 @@ const postCartDeleteProduct = async (req, res, next) => {
   res.redirect("/cart");
 };
 
-const getOrders = (req, res, next) => {
+const getOrders = async (req, res, next) => {
+  const orders = await req.user.getOrders({ include: ["Products"] });
+  console.log(orders[0].Products);
   res.render("shop/orders", {
     path: "/orders",
     pageTitle: "Your Orders",
+    orders: orders,
   });
 };
 const getCheckout = (req, res, next) => {
@@ -86,6 +89,19 @@ const getCheckout = (req, res, next) => {
     path: "/checkout",
     pageTitle: "Checkout",
   });
+};
+const createOrder = async (req, res, next) => {
+  const cart = await req.user.getCart();
+  const products = await cart.getProducts();
+  const order = await req.user.createOrder();
+  await order.addProduct(
+    products.map((product) => {
+      product.OrderDetail = { int_quantity: product.CartDetail.int_quantity };
+      return product;
+    })
+  );
+  await cart.setProducts(null);
+  res.redirect("/orders");
 };
 
 export default {
@@ -97,4 +113,5 @@ export default {
   getOrders,
   getCheckout,
   postCartDeleteProduct,
+  createOrder,
 };

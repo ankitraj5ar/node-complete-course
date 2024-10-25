@@ -2,5 +2,27 @@
 </head>
 <body>
     <%- include('../includes/navigation.ejs') %>
-    <h1>Nothing There</h1>
+    <main>
+        <% if (orders.length > 0) { %>
+            <ul class="cart__item-list">
+                <% orders.forEach(order => { %> 
+                    <li class="cart__item">
+                        <h1><%= order.int_order_id %> </h1>
+                        <ul class="cart__item-list">
+                            <% order.Products.forEach(product => { %> 
+                                <li class="cart__item">
+                                    <%= product.txt_title %> (<%= product.OrderDetail.int_quantity %>)
+                                </li>
+                            <% }) %>
+                        </ul>
+                       
+                    </li>
+                <% }) %>
+            </ul>
+
+
+        <% } else { %>
+            <h1>No Orders!</h1>
+        <% } %>
+    </main>
     <%- include('../includes/end.ejs') %>

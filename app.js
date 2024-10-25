@@ -10,6 +10,8 @@ import Product from "./models/product.js";
 import User from "./models/user.js";
 import Cart from "./models/cart.js";
 import CartDetail from "./models/cartDetail.js";
+import Order from "./models/order.js";
+import OrderDetail from "./models/orderDetail.js";
 // Get the current file's directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +43,10 @@ Cart.belongsTo(User);
 
 Cart.belongsToMany(Product, { through: CartDetail });
 Product.belongsToMany(Cart, { through: CartDetail });
+
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderDetail });
 
 // await sequelize.sync({ force: true });
 await sequelize.sync();
