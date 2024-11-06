@@ -1,8 +1,8 @@
 import Product from "../models/product.js"; // Add the .js extension
-import Cart from "../models/cart.js";
+// import Cart from "../models/cart.js";
 
 const getProducts = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await Product.find();
   res.render("shop/product-list", {
     prods: products,
     pageTitle: "All Products",
@@ -10,7 +10,7 @@ const getProducts = async (req, res, next) => {
   });
 };
 const getProduct = async (req, res, next) => {
-  const product = await Product.findByPk(req.params.int_product_id);
+  const product = await Product.findById(req.params.int_product_id);
   res.render("shop/product-detail", {
     product: product,
     pageTitle: product.txt_title,
@@ -18,7 +18,7 @@ const getProduct = async (req, res, next) => {
   });
 };
 const getIndex = async (req, res, next) => {
-  const products = await Product.findAll();
+  const products = await Product.find();
   res.render("shop/index", {
     prods: products,
     pageTitle: "Shop",

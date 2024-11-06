@@ -12,21 +12,22 @@ const getAddProduct = (req, res, next) => {
 };
 
 const AddProduct = async (req, res, next) => {
-  await req.user.createProduct(req.body);
-  // await Product.create({ ...req.body, UserIntUserId: req.user.int_user_id });
-  res.redirect("/admin/products");
-};
-
-const editProduct = async (req, res, next) => {
-  const product = await Product.findByPk(req.body.int_product_id);
-  Object.assign(product, req.body);
+  const product = new Product({ ...req.body, int_user_id: req.user });
   await product.save();
   res.redirect("/admin/products");
 };
 
+const editProduct = async (req, res, next) => {
+  const product = await Product.findByIdAndUpdate(
+    req.body.int_product_id,
+    req.body,
+    { new: true, runValidators: true }
+  );
+  res.redirect("/admin/products");
+};
+
 const deleteProduct = async (req, res, next) => {
-  const proudct = await Product.findByPk(req.body.int_product_id);
-  await proudct.destroy();
+  const proudct = await Product.findByIdAndDelete(req.body.int_product_id);
   res.redirect("/admin/products");
 };
 
@@ -36,7 +37,7 @@ const getEditProduct = async (req, res, next) => {
     return res.redirect("/");
   }
 
-  const product = await Product.findByPk(req.params.int_product_id);
+  const product = await Product.findById(req.params.int_product_id);
   if (!product) {
     return res.redirect("/");
   }
@@ -49,7 +50,7 @@ const getEditProduct = async (req, res, next) => {
 };
 
 const getProducts = async (req, res, next) => {
-  const products = await req.user.getProducts();
+  const products = await Product.find();
   res.render("admin/products", {
     prods: products,
     pageTitle: "Admin Products",

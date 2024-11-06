@@ -1,32 +1,12 @@
-// import { Sequelize } from "sequelize";
-// const sequelize = new Sequelize("node_complete", "root", "Admin@123", {
-//   dialect: "mysql",
-//   host: "localhost",
-// });
+import mongoose from "mongoose";
 
-// export default sequelize;
-
-/// mongodb connection
-
-import { MongoClient } from "mongodb";
-
-const url = "mongodb://127.0.0.1:27017"; // Local MongoDB URL
-const dbName = "nodejscomplete"; // Replace with your database name
-
-async function connectToMongo() {
-  const client = new MongoClient(url);
-
+async function connectToDatabase() {
   try {
-    await client.connect();
-    console.log("Connected successfully to MongoDB");
-
-    return client.db(dbName);
-    // Perform your database operations here
+    await mongoose.connect("mongodb://127.0.0.1/nodejscomplete", {});
+    console.log("Connected to MongoDB successfully");
   } catch (error) {
-    console.error("Connection failed", error);
-  } finally {
-    await client.close(); // Ensure the client is closed after operations
+    console.error("Error connecting to MongoDB:", error);
   }
 }
 
-export default await connectToMongo();
+export default await connectToDatabase();
