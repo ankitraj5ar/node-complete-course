@@ -1,5 +1,5 @@
 import Product from "../models/product.js"; // Add the .js extension
-// import Cart from "../models/cart.js";
+import Order from "../models/order.js";
 
 const getProducts = async (req, res, next) => {
   const products = await Product.find();
@@ -26,8 +26,9 @@ const getIndex = async (req, res, next) => {
   });
 };
 const getCart = async (req, res, next) => {
-  const cart = await req.user.getCart();
-  const products = await cart.getProducts();
+  const userCart = await req.user.populate("cart.items.int_product_id");
+  const products = userCart.cart.items;
+  console.log("products", products);
   res.render("shop/cart", {
     path: "/cart",
     pageTitle: "Your Cart",
@@ -36,42 +37,14 @@ const getCart = async (req, res, next) => {
 };
 const addCart = async (req, res, next) => {
   const prodId = req.body.int_product_id;
-  const cart = await req.user.getCart();
-  const products = await cart.getProducts({
-    where: { int_product_id: prodId },
-  });
-  let product;
-  if (products && products.length > 0) {
-    product = products[0];
-  }
-  let newQuantity = 1;
-  if (product) {
-    const oldQuantity = product.CartDetail.int_quantity;
-    newQuantity = oldQuantity + 1;
-    await cart.addProduct(product, { through: { int_quantity: newQuantity } });
-  } else {
-    const newProduct = await Product.findByPk(prodId);
-    await cart.addProduct(newProduct, {
-      through: { int_quantity: newQuantity },
-    });
-  }
-
+  const product = await Product.findById(prodId);
+  req.user.addToCart(product);
   res.redirect("/cart");
 };
 
 const postCartDeleteProduct = async (req, res, next) => {
   const prodId = req.body.int_product_id;
-  const cart = await req.user.getCart();
-  const products = await cart.getProducts({
-    where: { int_product_id: prodId },
-  });
-
-  let product;
-  if (products && products.length > 0) {
-    product = products[0];
-    await product.CartDetail.destroy();
-  }
-
+  await req.user.removeFromCart(prodId);
   res.redirect("/cart");
 };
 
@@ -84,16 +57,22 @@ const getOrders = async (req, res, next) => {
     orders: orders,
   });
 };
+
 const getCheckout = (req, res, next) => {
   res.render("shop/checkout", {
     path: "/checkout",
     pageTitle: "Checkout",
   });
 };
+
 const createOrder = async (req, res, next) => {
-  const cart = await req.user.getCart();
-  const products = await cart.getProducts();
-  const order = await req.user.createOrder();
+  const order = new Order({
+    user: {
+      name: req.user.name,
+      intUserId: req.user,
+    },
+  });
+
   await order.addProduct(
     products.map((product) => {
       product.OrderDetail = { int_quantity: product.CartDetail.int_quantity };

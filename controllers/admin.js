@@ -51,6 +51,7 @@ const getEditProduct = async (req, res, next) => {
 
 const getProducts = async (req, res, next) => {
   const products = await Product.find();
+  // .populate("int_user_id");
   res.render("admin/products", {
     prods: products,
     pageTitle: "Admin Products",
