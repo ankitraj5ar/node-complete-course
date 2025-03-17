@@ -28,7 +28,6 @@ const getIndex = async (req, res, next) => {
 const getCart = async (req, res, next) => {
   const userCart = await req.user.populate("cart.items.int_product_id");
   const products = userCart.cart.items;
-  console.log("products", products);
   res.render("shop/cart", {
     path: "/cart",
     pageTitle: "Your Cart",
@@ -49,8 +48,7 @@ const postCartDeleteProduct = async (req, res, next) => {
 };
 
 const getOrders = async (req, res, next) => {
-  const orders = await req.user.getOrders({ include: ["Products"] });
-  console.log(orders[0].Products);
+  const orders = await Order.find({ "user.intUserId": req.user._id });
   res.render("shop/orders", {
     path: "/orders",
     pageTitle: "Your Orders",
@@ -66,20 +64,22 @@ const getCheckout = (req, res, next) => {
 };
 
 const createOrder = async (req, res, next) => {
+  const userCart = await req.user.populate("cart.items.int_product_id");
+  const products = userCart.cart.items.map((product) => {
+    return {
+      quantity: product.dbl_quantity,
+      productData: { ...product.int_product_id._doc },
+    };
+  });
   const order = new Order({
     user: {
-      name: req.user.name,
+      name: req.user.txt_name,
       intUserId: req.user,
     },
+    products: products,
   });
-
-  await order.addProduct(
-    products.map((product) => {
-      product.OrderDetail = { int_quantity: product.CartDetail.int_quantity };
-      return product;
-    })
-  );
-  await cart.setProducts(null);
+  await order.save();
+  await req.user.clearCart();
   res.redirect("/orders");
 };
 
